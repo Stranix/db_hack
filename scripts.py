@@ -50,6 +50,9 @@ def create_commendation(schoolkid_full_name: str, lesson: str):
         schoolkid_lessons = Lesson.objects.filter(subject__title=lesson,
                                                   year_of_study=schoolkid.year_of_study,
                                                   group_letter=schoolkid.group_letter)
+        if not schoolkid_lessons:
+            print('Нет подходящих уроков')
+            return
         random_lesson = random.choice(schoolkid_lessons)
         Commendation.objects.create(text=random.choice(commendations),
                                     created=random_lesson.date,

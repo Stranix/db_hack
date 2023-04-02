@@ -6,7 +6,8 @@
 
 Чтобы запустить скрипт можно его целиком “копипастнуть” в `shell`, а можно положить файл с кодом рядом с manage.py и подключить через `import`
 
-Так же при работе через shell можно копировать и использовать каждую функцию по отдельности. Перед копированием функций `find_schoolkid_by_name,  fix_marks, remove_chastisements` необходимо предварительно выполнить импорт `from datacenter.models import Schoolkid`
+Так же при работе через shell можно копировать и использовать каждую функцию по отдельности.  
+Перед копированием функций `find_schoolkid_by_name,  fix_marks, remove_chastisements` необходимо предварительно выполнить импорт `from datacenter.models import Schoolkid`
 
 Для функции `create_commendation`  дополнительных действий не требуется.
 

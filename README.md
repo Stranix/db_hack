@@ -8,7 +8,7 @@
 
 Так же при работе через shell можно копировать и использовать каждую функцию по отдельности.  
 Перед копированием функций `find_schoolkid_by_name, fix_marks, remove_chastisements, create_commendation` необходимо предварительно выполнить импорт `from datacenter.models import Schoolkid`  
-Если собираетесь работать с функцией `create_commendation` дополнительно необходимо загрузить переменную COMMENDATIONS
+Если собираетесь работать с функцией `create_commendation` дополнительно необходимо загрузить переменную `COMMENDATIONS`
 
 ## Описание функций:
 

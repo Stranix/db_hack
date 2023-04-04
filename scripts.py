@@ -1,28 +1,27 @@
 from datacenter.models import Schoolkid
 
+COMMENDATIONS = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гораздо лучше, чем я ожидал!', 'Ты меня приятно удивил!',
+                 'Великолепно!', 'Прекрасно!', 'Ты меня очень обрадовал!', 'Именно этого я давно ждал от тебя!',
+                 'Сказано здорово – просто и ясно!', 'Ты, как всегда, точен!']
+
 
 def find_schoolkid_by_name(full_name: str) -> Schoolkid:
-    from django.core.exceptions import ObjectDoesNotExist
-    from django.core.exceptions import MultipleObjectsReturned
     try:
         schoolkid = Schoolkid.objects.get(full_name__contains=full_name)
         return schoolkid
-    except ObjectDoesNotExist:
+    except Schoolkid.DoesNotExist:
         print('Ученик не найден')
-    except MultipleObjectsReturned:
+    except Schoolkid.MultipleObjectsReturned:
         print('Найдено слишком много учеников. Попробуйте указать имя точнее')
 
 
 def fix_marks(schoolkid: Schoolkid):
     from datacenter.models import Mark
-    bad_marks = Mark.objects.filter(schoolkid=schoolkid.id, points__in=[2, 3])
+    bad_marks = Mark.objects.filter(schoolkid=schoolkid.id, points__in=[2, 3]).update(points=5)
     if not bad_marks:
         print(f'Не нашел плохих оценок у ученика {schoolkid.full_name}')
         return
-    for bad_mark in bad_marks:
-        bad_mark.points = 5
-        bad_mark.save()
-    print('Заменил все плохие оценки')
+    print(f'Заменил все плохие оценки. Количество: {bad_marks}')
 
 
 def remove_chastisements(schoolkid: Schoolkid):
@@ -37,30 +36,23 @@ def remove_chastisements(schoolkid: Schoolkid):
 
 def create_commendation(schoolkid_full_name: str, lesson: str):
     import random
-    from datacenter.models import Schoolkid
     from datacenter.models import Lesson
     from datacenter.models import Commendation
-    from django.core.exceptions import ObjectDoesNotExist
-    from django.core.exceptions import MultipleObjectsReturned
-    try:
-        commendations = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гораздо лучше, чем я ожидал!', 'Ты меня приятно удивил!',
-                         'Великолепно!', 'Прекрасно!', 'Ты меня очень обрадовал!', 'Именно этого я давно ждал от тебя!',
-                         'Сказано здорово – просто и ясно!', 'Ты, как всегда, точен!']
-        schoolkid = Schoolkid.objects.get(full_name__contains=schoolkid_full_name)
-        schoolkid_lessons = Lesson.objects.filter(subject__title=lesson,
-                                                  year_of_study=schoolkid.year_of_study,
-                                                  group_letter=schoolkid.group_letter)
-        if not schoolkid_lessons:
-            print('Нет подходящих уроков')
-            return
-        random_lesson = random.choice(schoolkid_lessons)
-        Commendation.objects.create(text=random.choice(commendations),
-                                    created=random_lesson.date,
-                                    schoolkid=schoolkid,
-                                    subject=random_lesson.subject,
-                                    teacher=random_lesson.teacher
-                                    )
-    except ObjectDoesNotExist:
-        print('Ученик не найден')
-    except MultipleObjectsReturned:
-        print('Найдено слишком много учеников. Попробуйте указать имя точнее')
+
+    schoolkid = find_schoolkid_by_name(schoolkid_full_name)
+    if not schoolkid:
+        return
+    random_schoolkid_lessons = Lesson.objects.filter(subject__title=lesson,
+                                                     year_of_study=schoolkid.year_of_study,
+                                                     group_letter=schoolkid.group_letter
+                                                     ).first()
+    if not random_schoolkid_lessons:
+        print('Нет подходящих уроков')
+        return
+
+    Commendation.objects.create(text=random.choice(COMMENDATIONS),
+                                created=random_schoolkid_lessons.date,
+                                schoolkid=schoolkid,
+                                subject=random_schoolkid_lessons.subject,
+                                teacher=random_schoolkid_lessons.teacher
+                                )
